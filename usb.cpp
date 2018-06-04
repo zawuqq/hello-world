@@ -2,31 +2,31 @@ HANDLE CDownLoadDlg::OpenMyHIDDevice(int overlapped) {
 // HANDLE hidHandle;
 	GUID hidGuid;
 	HDEVINFO hDevInfo;
-	HidD_GetHidGuid(&hidGuid);//µÃµ½HIDÂ·¾¶
-	hDevInfo = SetupDiGetClassDevs(&hidGuid,NULL,NULL,(DIGCF_PRESENT | DIGCF_DEVICEINTERFACE)); //µÃµ½Ò»ÀàÉè±¸ĞÅÏ¢£¬Ö»·µ»Øµ±Ç°´æÔÚµÄÉè±¸
+	HidD_GetHidGuid(&hidGuid);//å¾—åˆ°HIDè·¯å¾„    
+	hDevInfo = SetupDiGetClassDevs(&hidGuid,NULL,NULL,(DIGCF_PRESENT | DIGCF_DEVICEINTERFACE)); //å¾—åˆ°ä¸€ç±»è®¾å¤‡ä¿¡æ¯ï¼Œåªè¿”å›å½“å‰å­˜åœ¨çš„è®¾å¤‡
 	if (hDevInfo == INVALID_HANDLE_VALUE) {
 		return INVALID_HANDLE_VALUE;
 	}
 	SP_DEVICE_INTERFACE_DATA devInfoData;
 	devInfoData.cbSize = sizeof (SP_DEVICE_INTERFACE_DATA);
-	int deviceNo = 0; //Éè±¸ÁĞ±íÖĞµÄĞòºÅ
+	int deviceNo = 0; //è®¾å¤‡åˆ—è¡¨ä¸­çš„åºå·
 
 
 	SetLastError(NO_ERROR);
 	while (GetLastError() != ERROR_NO_MORE_ITEMS) {
-		if (SetupDiEnumInterfaceDevice (hDevInfo,0,&hidGuid,deviceNo,&devInfoData)) { //º¯Êı¹¦ÄÜÊÇ´ÓÒÑ¾­»ñÈ¡µÄÉè±¸½Ó¿ÚÁĞ±íĞÅÏ¢ÖĞ»ñÈ¡ĞÅÏ¢²¢Ê¹ÓÃ½á¹¹±£´æ,Ã¿µ÷ÓÃÒ»´Î»áÒÀ´Î·µ»ØÒ»¸ö½Ó¿ÚĞÅÏ¢
+		if (SetupDiEnumInterfaceDevice (hDevInfo,0,&hidGuid,deviceNo,&devInfoData)) { //å‡½æ•°åŠŸèƒ½æ˜¯ä»å·²ç»è·å–çš„è®¾å¤‡æ¥å£åˆ—è¡¨ä¿¡æ¯ä¸­è·å–ä¿¡æ¯å¹¶ä½¿ç”¨ç»“æ„ä¿å­˜,æ¯è°ƒç”¨ä¸€æ¬¡ä¼šä¾æ¬¡è¿”å›ä¸€ä¸ªæ¥å£ä¿¡æ¯
 			ULONG  requiredLength = 0;
-//È¡µÃ¸ÃÉè±¸½Ó¿ÚµÄÏ¸½Ú(Éè±¸Â·¾¶)
-			SetupDiGetInterfaceDeviceDetail(hDevInfo,// Éè±¸ĞÅÏ¢¼¯¾ä±ú
-			                                &devInfoData,  // Éè±¸½Ó¿ÚĞÅÏ¢
-			                                NULL, // Éè±¸½Ó¿ÚÏ¸½Ú(Éè±¸Â·¾¶)
-			                                0, // Êä³ö»º³åÇø´óĞ¡
-			                                &requiredLength,// ¼ÆËãÊä³ö»º³åÇø´óĞ¡
-			                                NULL);  // ²»Ğè¶îÍâµÄÉè±¸ÃèÊö
+//å–å¾—è¯¥è®¾å¤‡æ¥å£çš„ç»†èŠ‚(è®¾å¤‡è·¯å¾„)
+			SetupDiGetInterfaceDeviceDetail(hDevInfo,// è®¾å¤‡ä¿¡æ¯é›†å¥æŸ„
+			                                &devInfoData,  // è®¾å¤‡æ¥å£ä¿¡æ¯
+			                                NULL, // è®¾å¤‡æ¥å£ç»†èŠ‚(è®¾å¤‡è·¯å¾„)
+			                                0, // è¾“å‡ºç¼“å†²åŒºå¤§å°
+			                                &requiredLength,// è®¡ç®—è¾“å‡ºç¼“å†²åŒºå¤§å°
+			                                NULL);  // ä¸éœ€é¢å¤–çš„è®¾å¤‡æè¿°
 
 
-// PSP_INTERFACE_DEVICE_DETAIL_DATA devDetail = (SP_INTERFACE_DEVICE_DETAIL_DATA*)malloc(requiredLength);//·ÖÅä´óĞ¡ÎªrequiredLengthµÄÄÚ´æ¿é
-			PSP_INTERFACE_DEVICE_DETAIL_DATA devDetail = (PSP_INTERFACE_DEVICE_DETAIL_DATA)malloc(requiredLength);//·ÖÅä´óĞ¡ÎªrequiredLengthµÄÄÚ´æ¿é
+// PSP_INTERFACE_DEVICE_DETAIL_DATA devDetail = (SP_INTERFACE_DEVICE_DETAIL_DATA*)malloc(requiredLength);//åˆ†é…å¤§å°ä¸ºrequiredLengthçš„å†…å­˜å—
+			PSP_INTERFACE_DEVICE_DETAIL_DATA devDetail = (PSP_INTERFACE_DEVICE_DETAIL_DATA)malloc(requiredLength);//åˆ†é…å¤§å°ä¸ºrequiredLengthçš„å†…å­˜å—
 			devDetail->cbSize = sizeof(SP_INTERFACE_DEVICE_DETAIL_DATA);
 
 
@@ -45,28 +45,28 @@ HANDLE CDownLoadDlg::OpenMyHIDDevice(int overlapped) {
 
 
 			if (overlapped) {
-				hidHandle = CreateFile(devDetail->DevicePath,//Òª´ò¿ªµÄÎÄ¼şµÄÃû»òÉè±¸Ãû
-				                       GENERIC_READ | GENERIC_WRITE,//Èç¹ûÎª GENERIC_READ ±íÊ¾ÔÊĞí¶ÔÉè±¸½øĞĞ¶Á·ÃÎÊ£»
-//Èç¹ûÎª GENERIC_WRITE ±íÊ¾ÔÊĞí¶ÔÉè±¸½øĞĞĞ´·ÃÎÊ£¨¿É×éºÏÊ¹ÓÃ£©£»
-//Èç¹ûÎªÁã£¬±íÊ¾Ö»ÔÊĞí»ñÈ¡ÓëÒ»¸öÉè±¸ÓĞ¹ØµÄĞÅÏ¢
+				hidHandle = CreateFile(devDetail->DevicePath,//è¦æ‰“å¼€çš„æ–‡ä»¶çš„åæˆ–è®¾å¤‡å
+				                       GENERIC_READ | GENERIC_WRITE,//å¦‚æœä¸º GENERIC_READ è¡¨ç¤ºå…è®¸å¯¹è®¾å¤‡è¿›è¡Œè¯»è®¿é—®ï¼›
+//å¦‚æœä¸º GENERIC_WRITE è¡¨ç¤ºå…è®¸å¯¹è®¾å¤‡è¿›è¡Œå†™è®¿é—®ï¼ˆå¯ç»„åˆä½¿ç”¨ï¼‰ï¼›
+//å¦‚æœä¸ºé›¶ï¼Œè¡¨ç¤ºåªå…è®¸è·å–ä¸ä¸€ä¸ªè®¾å¤‡æœ‰å…³çš„ä¿¡æ¯
 // 0,
-				                       FILE_SHARE_READ | FILE_SHARE_WRITE,//Èç¹ûÊÇFILE_SHARE_READËæºó´ò¿ª²Ù×÷¶ÔÏó»á³É¹¦Ö»ÓĞÇëÇó¶Á·ÃÎÊ£»
-//Èç¹ûÊÇFILE_SHARE_WRITE Ëæºó´ò¿ª²Ù×÷¶ÔÏó»á³É¹¦Ö»ÓĞÇëÇóĞ´·ÃÎÊ
-				                       NULL, //¶¨ÒåÁËÎÄ¼şµÄ°²È«ÌØĞÔ
-				                       OPEN_EXISTING,//ÎÄ¼ş±ØĞëÒÑ¾­´æÔÚ£¬ÓÉÉè±¸Ìá³öÒªÇó
-				                       FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED,//ÔÊĞí¶ÔÎÄ¼ş½øĞĞÖØµş²Ù×÷
-				                       NULL);  //ÓÃÓÚ¸´ÖÆÎÄ¼ş¾ä±ú
+				                       FILE_SHARE_READ | FILE_SHARE_WRITE,//å¦‚æœæ˜¯FILE_SHARE_READéšåæ‰“å¼€æ“ä½œå¯¹è±¡ä¼šæˆåŠŸåªæœ‰è¯·æ±‚è¯»è®¿é—®ï¼›
+//å¦‚æœæ˜¯FILE_SHARE_WRITE éšåæ‰“å¼€æ“ä½œå¯¹è±¡ä¼šæˆåŠŸåªæœ‰è¯·æ±‚å†™è®¿é—®
+				                       NULL, //å®šä¹‰äº†æ–‡ä»¶çš„å®‰å…¨ç‰¹æ€§
+				                       OPEN_EXISTING,//æ–‡ä»¶å¿…é¡»å·²ç»å­˜åœ¨ï¼Œç”±è®¾å¤‡æå‡ºè¦æ±‚
+				                       FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED,//å…è®¸å¯¹æ–‡ä»¶è¿›è¡Œé‡å æ“ä½œ
+				                       NULL);  //ç”¨äºå¤åˆ¶æ–‡ä»¶å¥æŸ„
 				if(hidHandle==INVALID_HANDLE_VALUE) {
-					hidHandle = CreateFile(devDetail->DevicePath,//Òª´ò¿ªµÄÎÄ¼şµÄÃû»òÉè±¸Ãû
-// GENERIC_READ | GENERIC_WRITE,//Èç¹ûÎª GENERIC_READ ±íÊ¾ÔÊĞí¶ÔÉè±¸½øĞĞ¶Á·ÃÎÊ£»
-//Èç¹ûÎª GENERIC_WRITE ±íÊ¾ÔÊĞí¶ÔÉè±¸½øĞĞĞ´·ÃÎÊ£¨¿É×éºÏÊ¹ÓÃ£©£»
-//Èç¹ûÎªÁã£¬±íÊ¾Ö»ÔÊĞí»ñÈ¡ÓëÒ»¸öÉè±¸ÓĞ¹ØµÄĞÅÏ¢
+					hidHandle = CreateFile(devDetail->DevicePath,//è¦æ‰“å¼€çš„æ–‡ä»¶çš„åæˆ–è®¾å¤‡å
+// GENERIC_READ | GENERIC_WRITE,//å¦‚æœä¸º GENERIC_READ è¡¨ç¤ºå…è®¸å¯¹è®¾å¤‡è¿›è¡Œè¯»è®¿é—®ï¼›
+//å¦‚æœä¸º GENERIC_WRITE è¡¨ç¤ºå…è®¸å¯¹è®¾å¤‡è¿›è¡Œå†™è®¿é—®ï¼ˆå¯ç»„åˆä½¿ç”¨ï¼‰ï¼›
+//å¦‚æœä¸ºé›¶ï¼Œè¡¨ç¤ºåªå…è®¸è·å–ä¸ä¸€ä¸ªè®¾å¤‡æœ‰å…³çš„ä¿¡æ¯
 					                       0,
-					                       FILE_SHARE_READ | FILE_SHARE_WRITE,//Èç¹ûÊÇFILE_SHARE_READËæºó´ò¿ª²Ù×÷¶ÔÏó»á³É¹¦Ö»ÓĞÇëÇó¶Á·ÃÎÊ£»
-//Èç¹ûÊÇFILE_SHARE_WRITE Ëæºó´ò¿ª²Ù×÷¶ÔÏó»á³É¹¦Ö»ÓĞÇëÇóĞ´·ÃÎÊ
-					                       NULL, //¶¨ÒåÁËÎÄ¼şµÄ°²È«ÌØĞÔ
-					                       OPEN_EXISTING,//ÎÄ¼ş±ØĞëÒÑ¾­´æÔÚ£¬ÓÉÉè±¸Ìá³öÒªÇó
-					                       FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED,//ÔÊĞí¶ÔÎÄ¼ş½øĞĞÖØµş²Ù×÷
+					                       FILE_SHARE_READ | FILE_SHARE_WRITE,//å¦‚æœæ˜¯FILE_SHARE_READéšåæ‰“å¼€æ“ä½œå¯¹è±¡ä¼šæˆåŠŸåªæœ‰è¯·æ±‚è¯»è®¿é—®ï¼›
+//å¦‚æœæ˜¯FILE_SHARE_WRITE éšåæ‰“å¼€æ“ä½œå¯¹è±¡ä¼šæˆåŠŸåªæœ‰è¯·æ±‚å†™è®¿é—®
+					                       NULL, //å®šä¹‰äº†æ–‡ä»¶çš„å®‰å…¨ç‰¹æ€§
+					                       OPEN_EXISTING,//æ–‡ä»¶å¿…é¡»å·²ç»å­˜åœ¨ï¼Œç”±è®¾å¤‡æå‡ºè¦æ±‚
+					                       FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED,//å…è®¸å¯¹æ–‡ä»¶è¿›è¡Œé‡å æ“ä½œ
 					                       NULL);
 				}
 
@@ -78,7 +78,7 @@ HANDLE CDownLoadDlg::OpenMyHIDDevice(int overlapped) {
 				                       FILE_SHARE_READ | FILE_SHARE_WRITE,
 				                       NULL,
 				                       OPEN_EXISTING,
-				                       0, //²»ÔÊĞí¶ÔÎÄ¼ş½øĞĞÖØµş²Ù×÷
+				                       0, //ä¸å…è®¸å¯¹æ–‡ä»¶è¿›è¡Œé‡å æ“ä½œ
 				                       NULL);
 				if(hidHandle==INVALID_HANDLE_VALUE) {
 					hidHandle = CreateFile(devDetail->DevicePath,
@@ -87,7 +87,7 @@ HANDLE CDownLoadDlg::OpenMyHIDDevice(int overlapped) {
 					                       FILE_SHARE_READ | FILE_SHARE_WRITE,
 					                       NULL,
 					                       OPEN_EXISTING,
-					                       0, //²»ÔÊĞí¶ÔÎÄ¼ş½øĞĞÖØµş²Ù×÷
+					                       0, //ä¸å…è®¸å¯¹æ–‡ä»¶è¿›è¡Œé‡å æ“ä½œ
 					                       NULL);
 				}
 			}
@@ -103,7 +103,7 @@ HANDLE CDownLoadDlg::OpenMyHIDDevice(int overlapped) {
 
 			HIDD_ATTRIBUTES hidAttributes;
 // hidAttributes.Size=sizeof(hidAttributes);//LY
-			if(!HidD_GetAttributes(hidHandle, &hidAttributes)) { //Ó¦ÓÃ³ÌĞòµ÷ÓÃHIDº¯Êı£¬´«»Ø³§ÉÌID£¬²úÆ·IDÓë°æ±¾ºÅ
+			if(!HidD_GetAttributes(hidHandle, &hidAttributes)) { //åº”ç”¨ç¨‹åºè°ƒç”¨HIDå‡½æ•°ï¼Œä¼ å›å‚å•†IDï¼Œäº§å“IDä¸ç‰ˆæœ¬å·
 				free(devDetail);
 				CloseHandle(hidHandle);
 				SetupDiDestroyDeviceInfoList(hDevInfo);
@@ -111,17 +111,17 @@ HANDLE CDownLoadDlg::OpenMyHIDDevice(int overlapped) {
 			}
 
 
-			if   (USB_VID  == hidAttributes.VendorID//¶Ô±È³§¼ÒID
-			        && USB_PID  == hidAttributes.ProductID//¶Ô±È³§Æ·ID
-			        && USB_PVN  == hidAttributes.VersionNumber) { //¶Ô±ÈÈí¼şID
-				EventObject = CreateEvent(NULL, TRUE, TRUE, _T(""));//»ñµÃÊÂ¼ş¾ä±ú£¬¼àÌıÉè±¸
+			if   (USB_VID  == hidAttributes.VendorID//å¯¹æ¯”å‚å®¶ID
+			        && USB_PID  == hidAttributes.ProductID//å¯¹æ¯”å‚å“ID
+			        && USB_PVN  == hidAttributes.VersionNumber) { //å¯¹æ¯”è½¯ä»¶ID
+				EventObject = CreateEvent(NULL, TRUE, TRUE, _T(""));//è·å¾—äº‹ä»¶å¥æŸ„ï¼Œç›‘å¬è®¾å¤‡
 //Set the members of the overlapped structure.
 				HIDOverlapped.Offset = 0;
 				HIDOverlapped.OffsetHigh = 0;
 				HIDOverlapped.hEvent = EventObject;
 				break;
 			} else {
-				CloseHandle(hidHandle);//ÒıÓÃ¼ÆÊı¼õ1£¬µ±±äÎª0Ê±£¬ÏµÍ³É¾³ıÄÚºË¶ÔÏó
+				CloseHandle(hidHandle);//å¼•ç”¨è®¡æ•°å‡1ï¼Œå½“å˜ä¸º0æ—¶ï¼Œç³»ç»Ÿåˆ é™¤å†…æ ¸å¯¹è±¡
 				hidHandle   = INVALID_HANDLE_VALUE;
 				EventObject = NULL;
 				++deviceNo;
